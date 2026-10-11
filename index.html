@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Subin Yun · Portfolio Quest</title>
+  <meta name="description" content="UI/UX 디자이너 윤수빈의 인터랙티브 포트폴리오 — 패치를 모으고 펫을 키우며 프로젝트를 탐험하세요." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bagel+Fat+One&family=DotGothic16&family=Gaegu:wght@400;700&family=Gowun+Dodum&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <!-- 자수 질감용 공용 패턴 -->
+  <svg class="defs" width="0" height="0" aria-hidden="true">
+    <defs>
+      <pattern id="satin" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(38)">
+        <rect width="5" height="5" fill="transparent" />
+        <line x1="0" y1="0" x2="0" y2="5" stroke="#fff" stroke-opacity=".22" stroke-width="1.6" />
+      </pattern>
+      <pattern id="merrow" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(70)">
+        <line x1="0" y1="0" x2="0" y2="4" stroke="#fff" stroke-width="1.4" />
+      </pattern>
+    </defs>
+  </svg>
+
+  <div class="room">
+    <main class="mat" id="mat" aria-label="포트폴리오 커팅 매트">
+      <div class="ruler ruler-top" id="rulerTop" aria-hidden="true"></div>
+      <div class="ruler ruler-left" id="rulerLeft" aria-hidden="true"></div>
+      <div class="ruler ruler-right" id="rulerRight" aria-hidden="true"></div>
+      <div class="mat-angles" aria-hidden="true"></div>
+
+      <h1 class="tape name-tape">
+        <span class="tape-name">SUBIN YUN</span>
+        <span class="tape-role">UI/UX DESIGNER · PORTFOLIO QUEST</span>
+      </h1>
+
+      <p class="sticky-note" id="hint">
+        <b>HOW TO PLAY</b>
+        패치를 눌러 프로젝트를 보고,<br />
+        끌어다 출입증에 붙여보세요!<br />
+        <span>XP를 모으면 펫이 자라요 ✿</span>
+      </p>
+
+      <div class="patches" id="patches"></div>
+
+      <!-- 다마고치 -->
+      <section class="gotchi" id="gotchi" aria-label="디자인 펫">
+        <div class="gotchi-shell">
+          <span class="gotchi-brand">DESIGN·GOTCHI</span>
+          <div class="gotchi-screen">
+            <div class="gotchi-top"><span id="gLevel">LV.1</span><span id="gHearts">♡♡♡</span></div>
+            <canvas id="petCanvas" width="128" height="128" aria-hidden="true"></canvas>
+            <div class="gotchi-msg" id="gMsg">따뜻하게 품어주세요</div>
+          </div>
+          <div class="gotchi-btns">
+            <button type="button" data-act="feed" aria-label="밥 주기"><i>A</i>밥</button>
+            <button type="button" data-act="play" aria-label="놀아주기"><i>B</i>놀기</button>
+            <button type="button" data-act="sheet" aria-label="캐릭터 시트 열기"><i>C</i>상태</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 랜야드 + 출입증 -->
+      <div class="rig" id="rig">
+        <div class="strap" id="strap"></div>
+        <div class="clip"></div>
+        <div class="sleeve" id="sleeve" role="button" tabindex="0" aria-label="방문자 출입증 — 눌러서 뒤집기, 끌어서 흔들기">
+          <div class="sleeve-hole"></div>
+          <div class="card" id="card">
+            <div class="card-face card-front">
+              <div class="card-row">
+                <p class="card-title">PORTFOLIO<br /><span id="cardTier">VISITOR</span></p>
+                <div class="card-meta">
+                  <span id="cardDate">11 oct 2026</span>
+                  <span class="lv-chip" id="cardLevel">LV.1</span>
+                </div>
+              </div>
+              <canvas id="xpDigits" width="600" height="120" aria-label="XP"></canvas>
+              <div class="stickers" id="stickers"></div>
+            </div>
+            <div class="card-face card-back">
+              <p class="back-title">VISITOR INFO</p>
+              <dl class="back-list">
+                <div><dt>LEVEL</dt><dd id="bLevel">1</dd></div>
+                <div><dt>XP</dt><dd id="bXp">0</dd></div>
+                <div><dt>PATCHES</dt><dd id="bPatches">0 / 7</dd></div>
+                <div><dt>PET</dt><dd id="bPet">몰랑이</dd></div>
+                <div><dt>ISSUED BY</dt><dd>SUBIN STUDIO</dd></div>
+              </dl>
+              <div class="barcode" aria-hidden="true"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button class="ladybug" id="ladybug" type="button" aria-label="무당벌레">
+        <canvas width="40" height="36" id="bugCanvas"></canvas>
+      </button>
+    </main>
+
+    <!-- 하단 탭: 로딩 → HUD -->
+    <nav class="dock" id="dock" aria-label="게임 메뉴">
+      <div class="dock-loading" id="dockLoading">loading <span id="loadPct">0</span>%</div>
+      <div class="dock-hud" id="dockHud" hidden>
+        <div class="hud-level">
+          <canvas id="hudPet" width="32" height="32" aria-hidden="true"></canvas>
+          <b id="hudLevel">LV.1</b>
+        </div>
+        <div class="hud-xp" aria-label="경험치">
+          <div class="xp-track"><div class="xp-fill" id="xpFill"></div></div>
+          <small id="xpText">0 / 120 XP</small>
+        </div>
+        <button type="button" class="hud-btn" id="btnQuest">퀘스트 <span id="questCount">0/12</span></button>
+        <button type="button" class="hud-btn" id="btnSheet">캐릭터</button>
+        <button type="button" class="hud-btn" id="btnContact">연락하기</button>
+        <button type="button" class="hud-btn icon" id="btnSound" aria-label="소리 켜기/끄기" aria-pressed="true">♪</button>
+      </div>
+    </nav>
+  </div>
+
+  <!-- 퀘스트 영수증 -->
+  <aside class="receipt" id="receipt" aria-label="퀘스트 목록" hidden>
+    <div class="receipt-paper">
+      <p class="r-head">★ QUEST RECEIPT ★</p>
+      <p class="r-sub">SUBIN STUDIO · <span id="rDate"></span></p>
+      <p class="r-dash"></p>
+      <ul id="questList"></ul>
+      <p class="r-dash"></p>
+      <p class="r-total"><span>TOTAL XP</span><b id="rTotal">0</b></p>
+      <div class="barcode small" aria-hidden="true"></div>
+      <p class="r-thanks">THANK YOU FOR VISITING ♡</p>
+    </div>
+  </aside>
+
+  <!-- 캐릭터 시트 -->
+  <aside class="sheet" id="sheet" aria-label="캐릭터 시트" hidden>
+    <button class="close" type="button" data-close="sheet" aria-label="닫기">×</button>
+    <p class="sheet-label">CHARACTER SHEET</p>
+    <div class="sheet-pet">
+      <canvas id="sheetPet" width="160" height="160" aria-hidden="true"></canvas>
+      <div>
+        <label class="pet-name">
+          <span>이름</span>
+          <input id="petName" maxlength="10" value="몰랑이" />
+        </label>
+        <p class="sheet-lv"><b id="sLevel">LV.1</b> · <span id="sStage">알</span></p>
+        <p class="sheet-desc" id="sDesc"></p>
+      </div>
+    </div>
+    <p class="sheet-label">SKILL TREE <small>— 프로젝트를 열면 디자이너의 스킬이 공개돼요</small></p>
+    <ul class="stats" id="statList"></ul>
+    <p class="sheet-label">BADGES</p>
+    <ul class="badges" id="badgeList"></ul>
+    <div class="sheet-foot">
+      <a class="btn-ghost" id="resumeBtn" href="#" aria-disabled="true">🔒 이력서 (LV.5 해금)</a>
+      <button class="btn-ghost" type="button" id="resetBtn">새 게임</button>
+    </div>
+  </aside>
+
+  <!-- 프로젝트 파일 -->
+  <dialog class="folder" id="folder" aria-labelledby="fTitle">
+    <div class="folder-tab" id="fTab">PROJECT FILE</div>
+    <div class="folder-body">
+      <button class="close" type="button" data-close="folder" aria-label="닫기">×</button>
+      <div class="f-grid">
+        <figure class="polaroid">
+          <div class="polaroid-img" id="fImg"></div>
+          <figcaption id="fCaption"></figcaption>
+          <span class="tape tape-corner"></span>
+        </figure>
+        <div class="f-text">
+          <p class="f-period" id="fPeriod"></p>
+          <h2 id="fTitle"></h2>
+          <p class="f-role" id="fRole"></p>
+          <p class="f-summary" id="fSummary"></p>
+          <div class="f-stamps" id="fMetrics"></div>
+        </div>
+      </div>
+      <div class="f-cols">
+        <section class="note-paper">
+          <h3>PROBLEM</h3>
+          <p id="fProblem"></p>
+          <h3>OUTCOME</h3>
+          <p id="fOutcome"></p>
+        </section>
+        <section class="note-paper lined">
+          <h3>PROCESS</h3>
+          <ol id="fProcess"></ol>
+        </section>
+      </div>
+      <div class="f-foot">
+        <div class="labels" id="fTags"></div>
+        <button class="btn-primary" type="button" id="fStick">출입증에 붙이기 ✦</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- 연락처 엽서 -->
+  <dialog class="postcard" id="postcard" aria-labelledby="pcTitle">
+    <button class="close" type="button" data-close="postcard" aria-label="닫기">×</button>
+    <div class="pc-left">
+      <p class="pc-hello" id="pcTitle">Hello, there!</p>
+      <p class="pc-msg">
+        끝까지 탐험해줘서 고마워요.<br />
+        함께 만들고 싶은 이야기가 있다면<br />
+        언제든 편지 보내주세요 ✉
+      </p>
+      <p class="pc-sign">— Subin</p>
+    </div>
+    <div class="pc-right">
+      <div class="pc-stamp"><canvas id="stampPet" width="64" height="64" aria-hidden="true"></canvas><span>KR · 2026</span></div>
+      <div class="pc-lines">
+        <a id="pcEmail" href="#"></a>
+        <div id="pcLinks"></div>
+      </div>
+    </div>
+  </dialog>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+  <div class="levelup" id="levelup" hidden>
+    <div class="levelup-card">
+      <p class="lu-top">LEVEL UP!</p>
+      <canvas id="luPet" width="128" height="128" aria-hidden="true"></canvas>
+      <p class="lu-lv" id="luLv">LV.2</p>
+      <p class="lu-text" id="luText"></p>
+      <button class="btn-primary" type="button" id="luOk">좋아요!</button>
+    </div>
+  </div>
+  <canvas class="confetti" id="confetti" aria-hidden="true"></canvas>
+
+  <script src="js/data.js"></script>
+  <script src="js/pixel.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
